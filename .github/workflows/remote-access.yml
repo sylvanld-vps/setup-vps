@@ -16,6 +16,7 @@ jobs:
       
       
       - name: Generate a SSH key for GitHub actions
+        id: generate-key
         run: |
           ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa_github -q -N ""
           ls ~/.ssh/
