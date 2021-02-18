@@ -22,6 +22,6 @@ jobs:
           name: VPS_SSH_PRIVATE_KEY
           value: "hello world"
           repository: 'sylvanld-vps'
-          #token: ${{ secrets.ORGANISATION_ACCESS_TOKEN }}
+          token: ${{ secrets.ORGANISATION_ACCESS_TOKEN }}
           org: true
           visibility: 'all'
