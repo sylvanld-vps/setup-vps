@@ -1,0 +1,27 @@
+name: "Setup VPS"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  ssh-key:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+          
+      - name: Save SSH private key as a secret for the current organization
+        uses: hmanzur/actions-set-secret@v2.0.0
+        if: success() 
+        with:
+          name: VPS_SSH_PRIVATE_KEY
+          value: "hello world"
+          repository: 'sylvanld-vps'
+          #token: ${{ secrets.ORGANISATION_ACCESS_TOKEN }}
+          org: true
+          visibility: 'all'
