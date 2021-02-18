@@ -30,19 +30,10 @@ jobs:
       - name: Install package that enable remote access over SSH with plain password (required at first time)
         if: success()
         run: sudo apt-get install -y sshpass
-        
-      - name: Test sshpass with remote ls
-        uses: matheusvanzan/sshpass-action@v2
-        with:
-          host: ${{ secrets.VPS_DOMAIN_OR_IP }}
-          user: ${{ secrets.VPS_ROOT_USERNAME }}
-          pass: ${{ secrets.VPS_ROOT_PASSWORD }}
-          run: |
-            ls
       
       - name: Copy SSH key on remote host
         if: success()
-        run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} ssh-copy-id -f -i ~/.ssh/id_rsa_github.pub ${{ secrets.VPS_ROOT_USERNAME }}@${{ secrets.VPS_DOMAIN_OR_IP}}
+        run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} -o StrictHostKeyChecking=no ssh-copy-id -f -i ~/.ssh/id_rsa_github.pub ${{ secrets.VPS_ROOT_USERNAME }}@${{ secrets.VPS_DOMAIN_OR_IP}}
 
       - name: Save SSH public key as a secret for the current organization
         uses: hmanzur/actions-set-secret@v2.0.0
