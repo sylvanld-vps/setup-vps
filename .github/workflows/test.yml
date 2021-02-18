@@ -7,6 +7,10 @@ on:
     branches: [ main ]
 
   workflow_dispatch:
+  
+  
+env:
+  ORGANISATION_NAME: sylvanld-vps
 
 jobs:
   ssh-key:
@@ -28,7 +32,7 @@ jobs:
       
       - name: Copy SSH key on remote host
         if: success()
-        run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} ssh-copy-id -f -i ~/.ssh/id_rsa_github.pub ${{ secrets.VPS_ROOT_USER }}@${{ secrets.VPS_DOMAIN_OR_IP}}
+        run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} ssh-copy-id -f -i ~/.ssh/id_rsa_github.pub ${{ secrets.VPS_ROOT_USERNAME }}@${{ secrets.VPS_DOMAIN_OR_IP}}
 
       - name: Save SSH public key as a secret for the current organization
         uses: hmanzur/actions-set-secret@v2.0.0
@@ -36,7 +40,7 @@ jobs:
         with:
           name: VPS_SSH_PUBLIC_KEY
           value: ${{ steps.generate-key.outputs.PUBLIC_KEY }}
-          repository: 'sylvanld-vps'
+          repository: ${{ env.ORGANISATION_NAME }}
           token: ${{ secrets.ORGANISATION_ACCESS_TOKEN }}
           org: true
           visibility: 'all'
@@ -47,7 +51,7 @@ jobs:
         with:
           name: VPS_SSH_PRIVATE_KEY
           value: ${{ steps.generate-key.outputs.PRIVATE_KEY }}
-          repository: 'sylvanld-vps'
+          repository: ${{ env.ORGANISATION_NAME }}
           token: ${{ secrets.ORGANISATION_ACCESS_TOKEN }}
           org: true
           visibility: 'all'
