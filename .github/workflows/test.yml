@@ -23,12 +23,16 @@ jobs:
       - name: Generate a SSH key for GitHub actions
         run: |
           ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa_github -q -N ""
+          ls ~/.ssh/
           private_key=$(cat ~/.ssh/id_rsa_github) && echo '::set-output name=PRIVATE_KEY::${private_key}'
           public_key=$(cat ~/.ssh/id_rsa_github.pub) && echo '::set-output name=PUBLIC_KEY::${public_key}'
       
       - name: Install package that enable remote access over SSH with plain password (required at first time)
         if: success()
         run: sudo apt-get install -y sshpass
+        
+      - name: Test sshpass with remote ls
+        run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} ssh root@sylvan.ovh ls
       
       - name: Copy SSH key on remote host
         if: success()
