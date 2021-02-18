@@ -14,13 +14,39 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      
+      
+      - name: Generate a SSH key for GitHub actions
+        run: |
+          ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa_github -q -N ""
+          private_key=$(cat ~/.ssh/id_rsa_github) && echo '::set-output name=PRIVATE_KEY::${private_key}'
+          public_key=$(cat ~/.ssh/id_rsa_github.pub) && echo '::set-output name=PUBLIC_KEY::${public_key}'
+      
+      - name: Install package that enable remote access over SSH with plain password (required at first time)
+        if: success()
+        run: sudo apt-get install -y sshpass
+      
+      - name: Copy SSH key on remote host
+        if: success()
+        run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} ssh-copy-id -f -i ~/.ssh/id_rsa_github.pub ${{ secrets.VPS_ROOT_USER }}@${{ secrets.VPS_DOMAIN_OR_IP}}
+
+      - name: Save SSH public key as a secret for the current organization
+        uses: hmanzur/actions-set-secret@v2.0.0
+        if: success() 
+        with:
+          name: VPS_SSH_PUBLIC_KEY
+          value: ${{ steps.generate-key.outputs.PUBLIC_KEY }}
+          repository: 'sylvanld-vps'
+          token: ${{ secrets.ORGANISATION_ACCESS_TOKEN }}
+          org: true
+          visibility: 'all'
           
       - name: Save SSH private key as a secret for the current organization
         uses: hmanzur/actions-set-secret@v2.0.0
         if: success() 
         with:
           name: VPS_SSH_PRIVATE_KEY
-          value: "hello world"
+          value: ${{ steps.generate-key.outputs.PRIVATE_KEY }}
           repository: 'sylvanld-vps'
           token: ${{ secrets.ORGANISATION_ACCESS_TOKEN }}
           org: true
