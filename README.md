@@ -24,3 +24,7 @@
     * Then it creates {ssh_default_username} user with given password and groups (sudo, docker)
     * And it adds the previously generated SSH public key to this user .ssh/ folder
 4. If operation was successfully, the worker adds {ssh_default_username}, {ssh_private_key}, {ssh_public_key} as secrets for your organization
+
+## Install services
+
+Services are repositories container a file named `deploy.yml` at their root.
