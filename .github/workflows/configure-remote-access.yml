@@ -2,7 +2,21 @@ name: "Configure remote access"
 
 on:
   workflow_dispatch:
-  
+    inputs:
+      ssh_user_name:
+        description: 'Name of the user that will be created for subsequent SSH key-based access'     
+        required: true
+        default: 'warning'
+      ssh_user_password:
+        description: 'Sudo password of the user that will be created'     
+        required: true
+      vps_root_user:
+        description: 'Name of a user with root permissions used for initial VPS configuration'     
+        required: true
+        default: root
+      vps_root_password:
+        description: 'Password user with root permissions used for initial VPS configuration'     
+        required: true
   
 env:
   ORGANISATION_NAME: sylvanld-vps
