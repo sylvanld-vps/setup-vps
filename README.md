@@ -2,7 +2,14 @@
 
 > This project contains a set of github actions to configure a VPS from scratch to a Docker Swarm cluster.
 
+
+## Workflow overview
+
+![workflow overview](docs/images/global-workflow.png)
+
+
 ## Configure remote access
+
 ![setup remote access schema](docs/images/setup-remote-access.png)
 
 1. When manually launching this action, you will be prompted the following information.
