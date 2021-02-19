@@ -24,7 +24,7 @@ jobs:
       - name: Set up ssh-agent
         run: |
           eval `ssh-agent -s`
-          ssh-add - <<< $(echo ${{ secrets.VPS_SSH_PRIVATE_KEY }} | sed "s|-- |--\n|g" | sed "s| --|\n--|g")
+          ssh-add - <<< $(echo -e "${{ secrets.VPS_SSH_PRIVATE_KEY }}" | sed "s|-- |--\n|g" | sed "s| --|\n--|g")
           
       - name: Test SSH access
         run: ssh -o StrictHostKeyChecking=no root@sylvan.ovh ls
