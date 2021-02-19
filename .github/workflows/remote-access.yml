@@ -22,6 +22,8 @@ jobs:
           ls ~/.ssh/
           private_key=$(cat ~/.ssh/id_rsa_github) && echo '::set-output name=PRIVATE_KEY::${private_key}'
           public_key=$(cat ~/.ssh/id_rsa_github.pub) && echo '::set-output name=PUBLIC_KEY::${public_key}'
+          echo private: ${private_key}
+          echo public: ${public_key}
       
       - name: Install package that enable remote access over SSH with plain password (required at first time)
         if: success()
