@@ -20,7 +20,7 @@ jobs:
         run: |
           ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa_github -q -N ""
           ls ~/.ssh/
-          private_key=$(cat ~/.ssh/id_rsa_github) && private_key=${private_key//'%'/'%25'}" && private_key="${private_key//$'\n'/'%0A'}" && private_key="${private_key//$'\r'/'%0D'}" && echo '::set-output name=PRIVATE_KEY::${private_key}'
+          private_key=$(cat ~/.ssh/id_rsa_github) && private_key="${private_key//$'\n'/'%0A'}" && echo '::set-output name=PRIVATE_KEY::${private_key}'
           public_key=$(cat ~/.ssh/id_rsa_github.pub) && echo '::set-output name=PUBLIC_KEY::${public_key}'
           echo private: ${private_key}
           echo public: ${public_key}
