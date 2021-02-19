@@ -6,17 +6,7 @@ on:
       ssh_user_name:
         description: 'Name of the user that will be created for subsequent SSH key-based access'     
         required: true
-      ssh_user_password:
-        description: 'Sudo password of the user that will be created'     
-        required: true
-      vps_root_user:
-        description: 'Name of a user with root permissions used for initial VPS configuration'     
-        required: true
-        default: root
-      vps_root_password:
-        description: 'Password user with root permissions used for initial VPS configuration'     
-        required: true
-  
+    
 env:
   ORGANISATION_NAME: sylvanld-vps
 
@@ -50,6 +40,10 @@ jobs:
       - name: Copy SSH key on remote host
         if: success()
         run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} ssh-copy-id -o StrictHostKeyChecking=no -f -i ~/.ssh/id_rsa_github.pub ${{ secrets.VPS_ROOT_USERNAME }}@${{ secrets.VPS_DOMAIN_OR_IP}}
+        
+      - name: Create SSH action user
+        if: success()
+        run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} ssh ${{ secrets.VPS_ROOT_USERNAME }}@${{ secrets.VPS_DOMAIN_OR_IP}} -o StrictHostKeyChecking=no useradd ${{ github.event.inputs.ssh_user_name }} -m -b /home -s /bin/bash
 
       - name: Save SSH public key as a secret for the current organization
         uses: hmanzur/actions-set-secret@v2.0.0
