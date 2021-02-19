@@ -22,7 +22,4 @@ jobs:
         run: |
           eval `ssh-agent -s`
           ssh-add - <<< "${{ secrets.VPS_SSH_PRIVATE_KEY }}"
-          
-      - name: Test SSH access
-        run: ssh -o StrictHostKeyChecking=no root@sylvan.ovh ls
-      
+          ssh -o StrictHostKeyChecking=no root@sylvan.ovh ls
