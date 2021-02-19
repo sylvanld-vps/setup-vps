@@ -18,6 +18,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
+      - name: Display private key
+        run: echo ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+      
       - name: Set up ssh-agent
         run: |
           eval `ssh-agent -s`
