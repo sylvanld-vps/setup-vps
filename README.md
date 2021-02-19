@@ -27,4 +27,4 @@
 
 ## Install services
 
-Services are repositories container a file named `deploy.yml` at their root.
+Services are repositories containing a file named `deploy.yml` at their root.
