@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  frontend:
+    image: sylvanld/shopping-frontend
+    ports:
+      - 8080:80
+    environment:
+      VUE_APP_BACKEND_URL: http://sylvan.ovh:5000
+    deploy:
+      replicas: 2
+  
+  backend:
+    image: sylvanld/shopping-backend
+    ports:
+      - 5000:80
+    environment:
+      APP_CORS_ORIGINS: http://sylvan.ovh:8080
+      APP_SECRET_KEY: starfallahdzajidza
+      SHOPPING_DATABASE_URI: mongodb://sylvan.ovh:27017
+
+  database:
+    image: mongo:3
+    ports:
+      - 27017:27017
