@@ -34,8 +34,22 @@ jobs:
         if: success()
         run: sshpass -p ${{ github.event.inputs.vps_root_password }} scp ~/.ssh/id_rsa_github.pub root@${{secrets.VPS_HOST_OR_IP}}:id_rsa_github.pub
         
-      - name: Create SSH action user
+      - name: Install docker and create SSH action user with group docker
         if: success()
-        run: sshpass -p ${{ github.event.inputs.vps_root_password }} ssh root@${{ secrets.VPS_HOST_OR_IP }} useradd ${{ secrets.VPS_DEPLOY_USER }} -m -b /home -s /bin/bash
+        run: sshpass -p ${{ github.event.inputs.vps_root_password }} ssh root@${{ secrets.VPS_HOST_OR_IP }} <<-EOF
+          apt update && apt install -y docker.io
+          useradd ${{ secrets.VPS_DEPLOY_USER }} -m -b /home -s /bin/bash -G docker
+          mkdir -p /home/${{ secrets.VPS_DEPLOY_USER }}/.ssh
+          cat id_rsa_github.pub >> /home/${{ secrets.VPS_DEPLOY_USER }}/.ssh/authorized_keys
+          EOF
+          
+      - name: Disable ssh root access and password-based authentication
+        if: success()
+        run: sshpass -p ${{ github.event.inputs.vps_root_password }} ssh root@${{ secrets.VPS_HOST_OR_IP }} <<-EOF
+          sed -i 's/\(\#\)\{0,1\}PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_config
+          sed -i 's/\(\#\)\{0,1\}PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config
+          systemctl restart sshd
+          EOF
+          
 
       
