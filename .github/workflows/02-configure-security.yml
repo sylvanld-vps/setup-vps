@@ -38,7 +38,7 @@ jobs:
         if: success()
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
+          host: ${{ secrets.VPS_HOST_OR_IP }}
           username: root
           password: ${{ github.event.inputs.vps_root_password }}
           script: |
@@ -51,7 +51,7 @@ jobs:
         if: success()
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
+          host: ${{ secrets.VPS_HOST_OR_IP }}
           username: root
           password: ${{ github.event.inputs.vps_root_password }}
           script: |
