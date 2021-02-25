@@ -21,9 +21,9 @@ jobs:
       - name: Retrieve auth information for SSH access to VPS
         id: generate-key
         run: |
-          echo -e "${{VPS_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa_github
-          echo -e "${{VPS_SSH_PUBLIC_KEY}}" > ~/.ssh/id_rsa_github.pub
-          echo -e "${{VPS_SSH_FINGERPRINT}}" >> ~/.ssh/known_hosts
+          echo -e "${{secrets.VPS_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa_github
+          echo -e "${{secrets.VPS_SSH_PUBLIC_KEY}}" > ~/.ssh/id_rsa_github.pub
+          echo -e "${{secrets.VPS_SSH_FINGERPRINT}}" >> ~/.ssh/known_hosts
       
       - name: Install package that enable remote access over SSH with plain password (required at first time)
         if: success()
