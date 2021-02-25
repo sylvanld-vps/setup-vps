@@ -3,8 +3,8 @@ name: "02 - secure VPS"
 on:
   workflow_dispatch:
     inputs:
-      ssh_user_name:
-        description: 'Name of the user that will be created for subsequent SSH key-based access'
+      vps_root_password:
+        description: 'Password for root user, used to setup initial VPS configuration'
         required: true
     
 env:
@@ -18,20 +18,12 @@ jobs:
       - uses: actions/checkout@v2
       
       
-      - name: Generate a SSH key for GitHub actions
+      - name: Retrieve auth information for SSH access to VPS
         id: generate-key
         run: |
-          ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa_github -q -N ""
-          ls ~/.ssh/
-          private_key=$(cat ~/.ssh/id_rsa_github) && echo -e '::set-output name=PRIVATE_KEY::${private_key}'
-          public_key=$(cat ~/.ssh/id_rsa_github.pub) && echo '::set-output name=PUBLIC_KEY::${public_key}'
-          echo private: ${private_key}
-          echo public: ${public_key}
-          
-      - name: Debug private key
-        run: |
-          echo ${{ steps.generate-key.outputs.PRIVATE_KEY }}
-          echo ${{ steps.generate-key.outputs.PUBLIC_KEY }}
+          echo -e "${{VPS_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa_github
+          echo -e "${{VPS_SSH_PUBLIC_KEY}}" > ~/.ssh/id_rsa_github.pub
+          echo -e "${{VPS_SSH_FINGERPRINT}}" >> ~/.ssh/known_hosts
       
       - name: Install package that enable remote access over SSH with plain password (required at first time)
         if: success()
@@ -39,30 +31,10 @@ jobs:
       
       - name: Copy SSH key on remote host
         if: success()
-        run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} ssh-copy-id -o StrictHostKeyChecking=no -f -i ~/.ssh/id_rsa_github.pub ${{ secrets.VPS_ROOT_USERNAME }}@${{ secrets.VPS_DOMAIN_OR_IP}}
+        run: sshpass -p ${{ github.event.inputs.vps_root_password }} scp ~/.ssh/id_rsa_github.pub root@${{secrets.VPS_HOST_OR_IP}}:id_rsa_github.pub
         
       - name: Create SSH action user
         if: success()
-        run: sshpass -p ${{ secrets.VPS_ROOT_PASSWORD }} ssh ${{ secrets.VPS_ROOT_USERNAME }}@${{ secrets.VPS_DOMAIN_OR_IP}} -o StrictHostKeyChecking=no useradd ${{ github.event.inputs.ssh_user_name }} -m -b /home -s /bin/bash
+        run: sshpass -p ${{ github.event.inputs.vps_root_password }} ssh root@${{ secrets.VPS_HOST_OR_IP }} useradd ${{ secrets.VPS_DEPLOY_USER }} -m -b /home -s /bin/bash
 
-      - name: Save SSH public key as a secret for the current organization
-        uses: hmanzur/actions-set-secret@v2.0.0
-        if: success() 
-        with:
-          name: VPS_SSH_PUBLIC_KEY
-          value: ${{ steps.generate-key.outputs.PUBLIC_KEY }}
-          repository: ${{ env.ORGANISATION_NAME }}
-          token: ${{ secrets.ORGANISATION_ACCESS_TOKEN }}
-          org: true
-          visibility: 'all'
-          
-      - name: Save SSH private key as a secret for the current organization
-        uses: hmanzur/actions-set-secret@v2.0.0
-        if: success() 
-        with:
-          name: VPS_SSH_PRIVATE_KEY
-          value: ${{ steps.generate-key.outputs.PRIVATE_KEY }}
-          repository: ${{ env.ORGANISATION_NAME }}
-          token: ${{ secrets.ORGANISATION_ACCESS_TOKEN }}
-          org: true
-          visibility: 'all'
+      
