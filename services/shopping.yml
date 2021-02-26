@@ -12,8 +12,6 @@ services:
       - "traefik.port=80"
       - "traefik.http.routers.shopping-frontend.rule=Host(`shopping.${SERVER_DOMAIN}`)"
       - "traefik.http.routers.shopping-frontend.entrypoints=web"
-    deploy:
-      replicas: 2
   
   backend:
     image: sylvanld/shopping-backend
