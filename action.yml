@@ -1,0 +1,30 @@
+name: 'Deploy to Swarm'
+description: 'Use organization secrets (generated from this repo) to deploy to a swarm manager.'
+env:
+  SERVER_DOMAIN: ${{secrets.VPS_HOST_OR_IP}}
+inputs:
+  stack-name:
+    description: 'Name of the applicative stack to be deployed'
+    required: true
+  compose-file:
+    description: 'Path to the "compose-file" that describe deployment'
+    required: true
+    default: 'deployment.yml'
+runs:
+  using: "composite"
+  steps:
+    - run: echo Hello ${{ inputs.who-to-greet }}.
+      shell: bash
+    - id: random-number-generator
+      run: echo "::set-output name=random-id::$(echo $RANDOM)"
+      shell: bash
+    - run: ${{ github.action_path }}/goodbye.sh
+      shell: bash
+    
+    - name: Deploy example app to swarm
+      uses: sagebind/docker-swarm-deploy-action@v2
+      with:
+        remote_host: ssh://${{ secrets.VPS_DEPLOY_USER }}@${{ secrets.VPS_HOST_OR_IP }}
+        ssh_private_key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+        ssh_public_key: ${{ secrets.VPS_SSH_FINGERPRINT }}
+        args: stack deploy --compose-file ${{ github.action_path }}/${{ inputs.compose-file }} ${{ inputs.stack-name }}
