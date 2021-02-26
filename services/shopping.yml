@@ -5,6 +5,8 @@ services:
     image: sylvanld/shopping-frontend
     environment:
       VUE_APP_BACKEND_URL: http://api.shopping.sylvan.ovh
+    networks:
+      - www
     deploy:
       replicas: 2
       labels:
@@ -19,6 +21,8 @@ services:
       APP_CORS_ORIGINS: http://shopping.sylvan.ovh
       APP_SECRET_KEY: daod48izajdnadiuezf458fezf4ez8
       SHOPPING_DATABASE_URI: mongodb://sylvan.ovh:27017
+    networks:
+      - www
     deploy:
       labels:
         - "traefik.enable=true"
