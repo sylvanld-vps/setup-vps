@@ -28,3 +28,7 @@
 ## Install services
 
 Services are repositories containing a file named `deploy.yml` at their root.
+
+## TODO
+
+Fix issue: in workflow 02, fingerprint secret variable is not immediately available (variables seems to be computed at script startup (and not updated))
