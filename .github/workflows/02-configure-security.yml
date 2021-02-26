@@ -17,7 +17,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      
+      - name: Setup Python
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: 3.8.5
+          
+      - name: Install GitHub action tools
+        run: |
+          pip install libs/github/
+          github -h
+
+      - name: Discover and update VPS fingerprint stored as a secret
+        run: |
+          mkdir -p remote
+          ssh-keyscan ${{secrets.VPS_HOST_OR_IP}} > remote/fingerprint
+          github set-secret --org sylvanld-vps --name VPS_SSH_FINGERPRINT -p remote/fingerprint --key "${{secrets.ORG_ACCESS_TOKEN}}"
+          
       - name: Retrieve auth information for SSH access to VPS
         id: generate-key
         run: |
