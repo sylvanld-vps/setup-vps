@@ -12,7 +12,6 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -29,6 +28,7 @@ jobs:
           
       - name: Create www network
         uses: sagebind/docker-swarm-deploy-action@v2
+        if: always()
         with:
           remote_host: ssh://${{ secrets.VPS_DEPLOY_USER }}@${{ secrets.VPS_HOST_OR_IP }}
           ssh_private_key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
@@ -37,6 +37,7 @@ jobs:
           
       - name: Deploy administration services
         uses: sagebind/docker-swarm-deploy-action@v2
+        if: always()
         with:
           remote_host: ssh://${{ secrets.VPS_DEPLOY_USER }}@${{ secrets.VPS_HOST_OR_IP }}
           ssh_private_key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
