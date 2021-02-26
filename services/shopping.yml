@@ -19,7 +19,7 @@ services:
       APP_CORS_ORIGINS: http://shopping.sylvan.ovh
       APP_SECRET_KEY: daod48izajdnadiuezf458fezf4ez8
       SHOPPING_DATABASE_URI: mongodb://sylvan.ovh:27017
-     deploy:
+    deploy:
       labels:
         - "traefik.enable=true"
         - "traefik.port=80"
