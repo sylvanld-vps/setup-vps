@@ -3,21 +3,28 @@ version: "3"
 services:
   frontend:
     image: sylvanld/shopping-frontend
-    ports:
-      - 8080:80
     environment:
-      VUE_APP_BACKEND_URL: http://sylvan.ovh:5000
+      VUE_APP_BACKEND_URL: http://api.shopping.sylvan.ovh
     deploy:
       replicas: 2
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.http.routers.shopping-frontend.rule=Host(`shopping.${SERVER_DOMAIN}`)"
+        - "traefik.http.routers.shopping-frontend.entrypoints=web"
   
   backend:
     image: sylvanld/shopping-backend
-    ports:
-      - 5000:80
     environment:
-      APP_CORS_ORIGINS: http://sylvan.ovh:8080
-      APP_SECRET_KEY: starfallahdzajidza
+      APP_CORS_ORIGINS: http://shopping.sylvan.ovh
+      APP_SECRET_KEY: daod48izajdnadiuezf458fezf4ez8
       SHOPPING_DATABASE_URI: mongodb://sylvan.ovh:27017
+     deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.http.routers.shopping-backend.rule=Host(`api.shopping.${SERVER_DOMAIN}`)"
+        - "traefik.http.routers.shopping-backend.entrypoints=web"
 
   database:
     image: mongo:3
