@@ -7,13 +7,13 @@ services:
       VUE_APP_BACKEND_URL: http://api.shopping.sylvan.ovh
     networks:
       - www
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.http.routers.shopping-frontend.rule=Host(`shopping.${SERVER_DOMAIN}`)"
+      - "traefik.http.routers.shopping-frontend.entrypoints=web"
     deploy:
       replicas: 2
-      labels:
-        - "traefik.enable=true"
-        - "traefik.port=80"
-        - "traefik.http.routers.shopping-frontend.rule=Host(`shopping.${SERVER_DOMAIN}`)"
-        - "traefik.http.routers.shopping-frontend.entrypoints=web"
   
   backend:
     image: sylvanld/shopping-backend
@@ -23,17 +23,17 @@ services:
       SHOPPING_DATABASE_URI: mongodb://sylvan.ovh:27017
     networks:
       - www
-    deploy:
-      labels:
-        - "traefik.enable=true"
-        - "traefik.port=80"
-        - "traefik.http.routers.shopping-backend.rule=Host(`api.shopping.${SERVER_DOMAIN}`)"
-        - "traefik.http.routers.shopping-backend.entrypoints=web"
-
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.http.routers.shopping-backend.rule=Host(`api.shopping.${SERVER_DOMAIN}`)"
+      - "traefik.http.routers.shopping-backend.entrypoints=web"
+  
   database:
     image: mongo:3
     ports:
       - 27017:27017
+
 
 networks:
   www:
