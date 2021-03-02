@@ -5,8 +5,8 @@ services:
   traefik:
     image: "traefik:v2.2"
     command:
-      #- "--log.level=DEBUG"
       - "--api.insecure=true"
+      - "--providers.docker.swarmmode=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
@@ -17,20 +17,20 @@ services:
       - proxy
     ports:
       - 80:80
-      - 443:443
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`traefik.${SERVER_DOMAIN}`)"
-      - "traefik.http.routers.api.service=api@internal"
-      #- "traefik.http.routers.api.middlewares=auth"     
-    
+      - 443:443    
     deploy:
       mode: replicated
-      replicas: 1
-      placement:
-        constraints: [node.role == manager]
       restart_policy:
         condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.traefik.rule=Host(`traefik.${SERVER_DOMAIN}`)"
+        - "traefik.http.routers.traefik.service=api@internal"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+        - "traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:*"
+
 
   portainer:
     image: portainer/portainer
@@ -38,24 +38,40 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - "portainer_data:/data"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.port=9000"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.${SERVER_DOMAIN}`)"
-      - "traefik.http.routers.portainer.entrypoints=web"
     networks:
       - www
     depends_on:
       - traefik
-    
     deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+        - "traefik.http.routers.portainer.rule=Host(`portainer.${SERVER_DOMAIN}`)"
+        - "traefik.http.routers.portainer.entrypoints=web"
       mode: replicated
       replicas: 1
       placement:
         constraints: [node.role == manager]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:12.0.4
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    networks:
+      - www
+    depends_on:
+      - traefik
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+        - "traefik.http.routers.keycloak.rule=Host(`auth.${SERVER_DOMAIN}`)"
+        - "traefik.http.routers.keycloak.entrypoints=web"
     
 networks:
   www:
+    driver: overlay
     external: true
   proxy:
     driver: overlay
